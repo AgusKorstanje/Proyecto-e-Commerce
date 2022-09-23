@@ -93,48 +93,54 @@ function continuar(){
 }
 
 function encontrarProducto(){
-    if(filtremos == true){
-        let filtrados = Productos.filter(producto => producto.precio < preciofiltro)
-        let nombre = prompt("Ingrese el producto que esta buscando").toLowerCase();
-        let encontrado = filtrados.find(producto => producto.nombre === nombre);
-        const verif1 = filtrados.some(producto => producto.nombre === nombre);
-        const verif2 = Productos.some(producto => producto.nombre === nombre);
-        if(verif1 == true){
-            if (encontrado.stock > 0){
-                preciof = calcularTotal(encontrado.precio);
-            }
-            else{
-                alert("no hay mas stock");
-            }
-        }
-        else if (verif1 == false && verif2 == true){
-            let conf = prompt("el producto deseado fue filtrado, desea añadirlo igualmente?").toUpperCase();
-            if (conf == "SI"){
-                encontrado = Productos.find(producto => producto.nombre === nombre);
-                console.log(encontrado);
+    let nombre = prompt("Ingrese el producto que esta buscando").toLowerCase();
+    const tengoprod = Productos.some(producto => producto.nombre === nombre);
+    if(tengoprod == true){
+        if(filtremos == true){
+            let filtrados = Productos.filter(producto => producto.precio < preciofiltro);
+            let encontrado = filtrados.find(producto => producto.nombre === nombre);
+            const verif1 = filtrados.some(producto => producto.nombre === nombre);
+            const verif2 = Productos.some(producto => producto.nombre === nombre);
+            if(verif1 == true){
                 if (encontrado.stock > 0){
                     preciof = calcularTotal(encontrado.precio);
+                    console.log(encontrado.nombre);
+                    console.log(encontrado.precio);
                 }
                 else{
                     alert("no hay mas stock");
                 }
             }
-            else{}
+            else if (verif1 == false && verif2 == true){
+                let conf = prompt("el producto deseado fue filtrado, desea añadirlo igualmente?").toUpperCase();
+                if (conf == "SI"){
+                    encontrado = Productos.find(producto => producto.nombre === nombre);
+                    if (encontrado.stock > 0){
+                        preciof = calcularTotal(encontrado.precio);
+                        console.log(encontrado.nombre);
+                        console.log(encontrado.precio);
+                    }
+                    else{
+                        alert("no hay mas stock");
+                    }
+                }
+                else{}
+            }
         }
-        console.log(encontrado.nombre);
-        console.log(encontrado.precio);
+        else {
+            const encontrado = Productos.find(producto => producto.nombre === nombre);
+            if (encontrado.stock > 0){
+                preciof = calcularTotal(encontrado.precio);
+                console.log(encontrado.nombre);
+                console.log(encontrado.precio);
+            }
+            else{
+                alert("no hay mas stock");
+            }
+        }
     }
-    else {
-        let nombre = prompt("Ingrese el producto que esta buscando").toLowerCase();
-        const encontrado = Productos.find(producto => producto.nombre === nombre);
-        if (encontrado.stock > 0){
-            preciof = calcularTotal(encontrado.precio);
-        }
-        else{
-            alert("no hay mas stock");
-        }
-        console.log(encontrado.nombre);
-        console.log(encontrado.precio);
+    else{
+        alert("no contamos con ese producto");
     }
 }
 
