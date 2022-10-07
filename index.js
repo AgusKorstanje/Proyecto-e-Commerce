@@ -1,12 +1,13 @@
-let preciof = 0;
-let seguir = true;
-let usuario;
-let preciofiltro;
-let sigue;
-let filtro;
-let filtremos = false;
-
+const div = document.getElementById("cards");
+const carrito = document.getElementById("mostrarcarrito");
+const limpiar = document.getElementById("limpiar");
 const Productos = [];
+let Carrito = [];
+let carritoStorage = JSON.parse(localStorage.getItem("carrito"));
+
+if(carritoStorage){
+    Carrito = carritoStorage;
+}
 
 class Producto{
     constructor (info){
@@ -14,6 +15,7 @@ class Producto{
         this.nombre = info.nombre;
         this.precio = info.precio;
         this.stock = info.stock;
+        this.imagen = info.imagen;
     }
 }
 
@@ -22,7 +24,8 @@ Productos.push(new Producto(
         id: 1,
         nombre: "remera",
         precio: 2000,
-        stock: 17
+        stock: 17,
+        imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpzd6fy7juijZTShkY4SNIwIG_LYVuJxayn4232ax2_XVhqKCGcnJcbM6BIae5dh3gk2E&usqp=CAU"
     }
     )
 )
@@ -31,7 +34,8 @@ Productos.push(new Producto(
         id: 2,
         nombre: "pantalon",
         precio: 2500,
-        stock: 14
+        stock: 14,
+        imagen: "https://www.dexter.com.ar/on/demandware.static/-/Sites-dabra-catalog/default/dw04d7fefa/products/AD_GK8831/AD_GK8831-1.JPG"
     }
     )
 )
@@ -40,7 +44,8 @@ Productos.push(new Producto(
         id: 3,
         nombre: "campera",
         precio: 4500,
-        stock: 8
+        stock: 8,
+        imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYiUB-i7UtOjht5BXb2xBRlOiaxS-NMGBSYw&usqp=CAU"
     }
     )
 )
@@ -49,7 +54,8 @@ Productos.push(new Producto(
         id: 4,
         nombre: "buzo",
         precio: 4000,
-        stock: 9
+        stock: 9,
+        imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ4BItZPETmpiogLa9A0h_5D1ET6adHW-9QA&usqp=CAU"
     }
     )
 )
@@ -58,7 +64,8 @@ Productos.push(new Producto(
         id: 5,
         nombre: "zapatillas",
         precio: 15000,
-        stock: 2
+        stock: 2,
+        imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF8zhqCVsXW2ymxwrQSUOO2RPamvyiS844Pw&usqp=CAU"
     }
     )
 )
@@ -67,7 +74,8 @@ Productos.push(new Producto(
         id: 6,
         nombre: "medias",
         precio: 500,
-        stock: 10
+        stock: 10,
+        imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPqZcPAmz062v0gqIjFzT4a4qNWI9sdpIQQw&usqp=CAU"
     }
     )
 )
@@ -76,94 +84,49 @@ Productos.push(new Producto(
         id: 7,
         nombre: "guantes",
         precio: 700,
-        stock: 7
+        stock: 7,
+        imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDxZaKIzPudtBvfRzISlFm6a7PGBb8jASQVA&usqp=CAU"
     }
     )
 )
 
-function calcularTotal(precioProducto){
-    return preciof + precioProducto;
+Productos.forEach(producto => {
+    let tarjeta = document.createElement("div")
+    tarjeta.innerHTML = `
+    <div class="card" style="width: 18rem;">
+        <img src="${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
+        <div class="card-body">
+            <h5 class="card-title">${producto.nombre}</h5>
+            <p class="card-text">precio: $${producto.precio}</p>
+        </div>
+    <button id=${producto.id}>Comprar</button>
+    </div>`
+    div.append(tarjeta);
+
+    const boton = document.getElementById(producto.id);
+    boton.addEventListener("click", () => comprarProducto(producto));
+})
+
+const comprarProducto = (producto) => {
+    let productoExiste = Carrito.find(item => item.id === producto.id);
+    if(productoExiste === undefined){
+        Carrito.push({
+            id: producto.id,
+            nombre:producto.nombre,
+            precio:producto.precio,
+            cantidad: 1
+        })
+    }
+    else {
+        productoExiste.precio = productoExiste.precio + producto.precio;
+        productoExiste.cantidad = productoExiste.cantidad + 1;
+    }
+    localStorage.setItem("carrito", JSON.stringify(Carrito));
 }
 
-function continuar(){
-    sigue = prompt("quiere seguir comprando?").toUpperCase();
-        if (sigue != "SI"){
-            seguir = false;
-        }
-}
+carrito.addEventListener("click" , () => console.log(Carrito));
 
-function encontrarProducto(){
-    let nombre = prompt("Ingrese el producto que esta buscando").toLowerCase();
-    const tengoprod = Productos.some(producto => producto.nombre === nombre);
-    if(tengoprod == true){
-        if(filtremos == true){
-            let filtrados = Productos.filter(producto => producto.precio < preciofiltro);
-            let encontrado = filtrados.find(producto => producto.nombre === nombre);
-            const verif1 = filtrados.some(producto => producto.nombre === nombre);
-            const verif2 = Productos.some(producto => producto.nombre === nombre);
-            if(verif1 == true){
-                if (encontrado.stock > 0){
-                    preciof = calcularTotal(encontrado.precio);
-                    console.log(encontrado.nombre);
-                    console.log(encontrado.precio);
-                }
-                else{
-                    alert("no hay mas stock");
-                }
-            }
-            else if (verif1 == false && verif2 == true){
-                let conf = prompt("el producto deseado fue filtrado, desea añadirlo igualmente?").toUpperCase();
-                if (conf == "SI"){
-                    encontrado = Productos.find(producto => producto.nombre === nombre);
-                    if (encontrado.stock > 0){
-                        preciof = calcularTotal(encontrado.precio);
-                        console.log(encontrado.nombre);
-                        console.log(encontrado.precio);
-                    }
-                    else{
-                        alert("no hay mas stock");
-                    }
-                }
-                else{}
-            }
-        }
-        else {
-            const encontrado = Productos.find(producto => producto.nombre === nombre);
-            if (encontrado.stock > 0){
-                preciof = calcularTotal(encontrado.precio);
-                console.log(encontrado.nombre);
-                console.log(encontrado.precio);
-            }
-            else{
-                alert("no hay mas stock");
-            }
-        }
-    }
-    else{
-        alert("no contamos con ese producto");
-    }
-}
-
-usuario = prompt("ingrese su nombre").toUpperCase();
-let mensaje =   `hola ${usuario}, bienvenido a nuestra tienda, para agregar al carrito ingrese el nombre de lo que esta buscando, contamos con:`
-alert(mensaje);
-Productos.forEach((item) => {
-    let mostrar = `
-    nombre: ${item.nombre}
-    a $${item.precio}
-    `;    
-    alert(mostrar);
-    }
-);
-filtro = prompt("queres filtrar por precios?").toUpperCase();
-    if (filtro == "SI"){
-        filtremos = true;
-        preciofiltro = Number(prompt("ingrese precio maximo"))
-    }
-while(usuario != "ESC" && seguir == true){
-    encontrarProducto();
-    continuar();
-}
-
-console.log(usuario);
-console.log(preciof);
+limpiar.addEventListener("click", () => {
+    Carrito.splice(0, Carrito.length);
+    localStorage.clear();
+});
