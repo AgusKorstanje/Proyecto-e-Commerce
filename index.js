@@ -1,3 +1,10 @@
+let preciof = 0;
+let seguir = true;
+let usuario;
+let preciofiltro;
+let sigue;
+
+const filtro = document.getElementById("filtro");
 const div = document.getElementById("cards");
 const carrito = document.getElementById("mostrarcarrito");
 const limpiar = document.getElementById("limpiar");
@@ -130,3 +137,7 @@ limpiar.addEventListener("click", () => {
     Carrito.splice(0, Carrito.length);
     localStorage.clear();
 });
+
+filtro.addEventListener("click", () => {
+    preciofiltro = Number(prompt("ingrese precio maximo"));
+})
