@@ -5,9 +5,10 @@ let preciofiltro;
 let sigue;
 
 const filtro = document.getElementById("filtro");
-const div = document.getElementById("cards");
-const carrito = document.getElementById("mostrarcarrito");
+const cards = document.getElementById("cards");
+const mostcarrito = document.getElementById("mostrarcarrito");
 const limpiar = document.getElementById("limpiar");
+const carrito = document.getElementById("carrito");
 const Productos = [];
 let Carrito = [];
 let carritoStorage = JSON.parse(localStorage.getItem("carrito"));
@@ -108,19 +109,40 @@ Productos.forEach(producto => {
         </div>
     <button id=${producto.id}>Comprar</button>
     </div>`
-    div.append(tarjeta);
+    cards.append(tarjeta);
 
     const boton = document.getElementById(producto.id);
     boton.addEventListener("click", () => comprarProducto(producto));
 })
 
+actualizarcarrito = () => {
+    carrito.innerHTML = "";
+Carrito.forEach(prod=> {
+    let carro = document.createElement("div")
+    carro.innerHTML = `
+    <p>${prod.nombre}</p>
+    <p>${prod.precio}</p>
+    <p>${prod.cantidad}</p>`
+    carrito.append(carro);
+    })
+}
+
 const comprarProducto = (producto) => {
+    Swal.fire({
+        position: 'top',
+        icon: 'success',
+        title: 'Agregado al carrito',
+        imageUrl: `${producto.imagen}`,
+        showConfirmButton: false,
+        timer: 1500
+    })
     let productoExiste = Carrito.find(item => item.id === producto.id);
     if(productoExiste === undefined){
         Carrito.push({
             id: producto.id,
             nombre:producto.nombre,
             precio:producto.precio,
+            imagen:producto.imagen,
             cantidad: 1
         })
     }
@@ -131,13 +153,40 @@ const comprarProducto = (producto) => {
     localStorage.setItem("carrito", JSON.stringify(Carrito));
 }
 
-carrito.addEventListener("click" , () => console.log(Carrito));
-
+mostcarrito.addEventListener("click" , () => {
+    console.log(Carrito);
+    actualizarcarrito();
+})
+    
 limpiar.addEventListener("click", () => {
-    Carrito.splice(0, Carrito.length);
-    localStorage.clear();
-});
-
-filtro.addEventListener("click", () => {
-    preciofiltro = Number(prompt("ingrese precio maximo"));
+    Swal.fire({
+        title: 'Esta seguro que desea borrar el carrito?',
+        text: "No podra recuperarlo, y debera cargarlo nuevamente",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, seguro',
+        cancelButtonText: 'cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+        Swal.fire(
+            'Borrado',
+            'El carrito fue borrado exitosamente',
+            'success'
+        )
+        Carrito.splice(0, Carrito.length);
+        localStorage.clear();
+        }
+        else if (
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            Swal.fire(
+            'cancelado',
+            'el carrito no fue borrado',
+            'error'
+            )
+        }
+    })
+    actualizarcarrito();
 })
