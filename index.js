@@ -153,11 +153,8 @@ const comprarProducto = (producto) => {
     localStorage.setItem("carrito", JSON.stringify(Carrito));
 }
 
-mostcarrito.addEventListener("click" , () => {
-    console.log(Carrito);
-    actualizarcarrito();
-})
-    
+mostcarrito.addEventListener("click" , actualizarcarrito());
+
 limpiar.addEventListener("click", () => {
     Swal.fire({
         title: 'Esta seguro que desea borrar el carrito?',
